@@ -20,6 +20,8 @@
 #include "ElaTheme.h"
 #include "private/ElaSuggestBoxPrivate.h"
 
+#include <QKeyEvent>
+
 Q_PROPERTY_CREATE_Q_CPP(ElaSuggestBox, int, BorderRadius)
 Q_PROPERTY_CREATE_Q_CPP(ElaSuggestBox, Qt::CaseSensitivity, CaseSensitivity)
 ElaSuggestBox::ElaSuggestBox(QWidget* parent)
@@ -34,6 +36,7 @@ ElaSuggestBox::ElaSuggestBox(QWidget* parent)
     d->_searchEdit->setFixedHeight(35);
     d->_searchEdit->setPlaceholderText("查找功能");
     d->_searchEdit->setClearButtonEnabled(true);
+    d->_searchEdit->installEventFilter(this);
     d->_lightSearchAction = new QAction(ElaIcon::getInstance()->getElaIcon(ElaIconType::MagnifyingGlass), "Search", this);
     d->_darkSearchAction = new QAction(ElaIcon::getInstance()->getElaIcon(ElaIconType::MagnifyingGlass, QColor(0xFF, 0xFF, 0xFF)), "Search", this);
 
@@ -126,14 +129,23 @@ void ElaSuggestBox::removeSuggestion(const QString& suggestKey)
     }
 }
 
-void ElaSuggestBox::removeSuggestion(int index)
-{
+void ElaSuggestBox::removeSuggestion(int index) {
     Q_D(ElaSuggestBox);
-    if (index >= d->_suggestionVector.count())
-    {
+    if (index >= d->_suggestionVector.count()) {
         return;
     }
-    ElaSuggestion* suggest = d->_suggestionVector[index];
+    ElaSuggestion *suggest = d->_suggestionVector[index];
     d->_suggestionVector.removeOne(suggest);
     suggest->deleteLater();
+}
+bool ElaSuggestBox::eventFilter(QObject *obj, QEvent *event) {
+    Q_D(ElaSuggestBox);
+    if (obj == d->_searchEdit && event->type() == QEvent::KeyPress) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) {
+            emit this->sigEnterPressed(d->_searchEdit->text());
+            return true;
+        }
+    }
+    return QWidget::eventFilter(obj, event);
 }
