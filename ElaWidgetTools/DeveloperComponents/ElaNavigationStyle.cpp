@@ -1,56 +1,66 @@
 #include "ElaNavigationStyle.h"
 
-#include <QPainter>
-#include <QPainterPath>
-#include <QPropertyAnimation>
-#include <QStyleOption>
-
 #include "ElaNavigationModel.h"
 #include "ElaNavigationNode.h"
 #include "ElaNavigationView.h"
 #include "ElaTheme.h"
+#include <QDebug>
+#include <QPainter>
+#include <QPainterPath>
+#include <QPropertyAnimation>
+#include <QStyleOption>
 ElaNavigationStyle::ElaNavigationStyle(QStyle* style)
 {
     _pOpacity = 1;
-    _pItemHeight = 40;
-    _pLastSelectMarkTop = 10.0;
-    _pLastSelectMarkBottom = 10.0;
-    _pSelectMarkTop = 10.0;
-    _pSelectMarkBottom = 10.0;
+    _pItemHeight = 38;
+    _pLastSelectMarkTop = 10.5;
+    _pLastSelectMarkBottom = 10.5;
+    _pSelectMarkTop = 10.5;
+    _pSelectMarkBottom = 10.5;
 
     // Mark向上
     _lastSelectMarkTopAnimation = new QPropertyAnimation(this, "pLastSelectMarkTop");
-    connect(_lastSelectMarkTopAnimation, &QPropertyAnimation::valueChanged, this, [=](const QVariant& value) { _pNavigationView->viewport()->update(); });
+    connect(_lastSelectMarkTopAnimation, &QPropertyAnimation::valueChanged, this, [=](const QVariant& value) {
+        _pNavigationView->viewport()->update();
+    });
     _lastSelectMarkTopAnimation->setDuration(300);
     _lastSelectMarkTopAnimation->setEasingCurve(QEasingCurve::InOutSine);
 
     _selectMarkBottomAnimation = new QPropertyAnimation(this, "pSelectMarkBottom");
-    connect(_selectMarkBottomAnimation, &QPropertyAnimation::valueChanged, this, [=](const QVariant& value) { _pNavigationView->viewport()->update(); });
+    connect(_selectMarkBottomAnimation, &QPropertyAnimation::valueChanged, this, [=](const QVariant& value) {
+        _pNavigationView->viewport()->update();
+    });
     _selectMarkBottomAnimation->setDuration(300);
     _selectMarkBottomAnimation->setEasingCurve(QEasingCurve::InOutSine);
     connect(_lastSelectMarkTopAnimation, &QPropertyAnimation::finished, this, [=]() {
         _isSelectMarkDisplay = true;
         _lastSelectedNode = nullptr;
         _selectMarkBottomAnimation->setStartValue(0);
-        _selectMarkBottomAnimation->setEndValue(10);
-        _selectMarkBottomAnimation->start(); });
+        _selectMarkBottomAnimation->setEndValue(10.5);
+        _selectMarkBottomAnimation->start();
+    });
 
     // Mark向下
     _lastSelectMarkBottomAnimation = new QPropertyAnimation(this, "pLastSelectMarkBottom");
-    connect(_lastSelectMarkBottomAnimation, &QPropertyAnimation::valueChanged, this, [=](const QVariant& value) { _pNavigationView->viewport()->update(); });
+    connect(_lastSelectMarkBottomAnimation, &QPropertyAnimation::valueChanged, this, [=](const QVariant& value) {
+        _pNavigationView->viewport()->update();
+    });
     _lastSelectMarkBottomAnimation->setDuration(300);
     _lastSelectMarkBottomAnimation->setEasingCurve(QEasingCurve::InOutSine);
 
     _selectMarkTopAnimation = new QPropertyAnimation(this, "pSelectMarkTop");
-    connect(_selectMarkTopAnimation, &QPropertyAnimation::valueChanged, this, [=](const QVariant& value) { _pNavigationView->viewport()->update(); });
+    connect(_selectMarkTopAnimation, &QPropertyAnimation::valueChanged, this, [=](const QVariant& value) {
+        _pNavigationView->viewport()->update();
+    });
     _selectMarkTopAnimation->setDuration(300);
     _selectMarkTopAnimation->setEasingCurve(QEasingCurve::InOutSine);
     connect(_lastSelectMarkBottomAnimation, &QPropertyAnimation::finished, this, [=]() {
         _isSelectMarkDisplay = true;
         _lastSelectedNode = nullptr;
-        _selectMarkTopAnimation->setStartValue(0);
-        _selectMarkTopAnimation->setEndValue(10);
-        _selectMarkTopAnimation->start(); });
+        _selectMarkTopAnimation->setStartValue(0.0);
+        _selectMarkTopAnimation->setEndValue(10.5);
+        _selectMarkTopAnimation->start();
+    });
     _themeMode = eTheme->getThemeMode();
     connect(eTheme, &ElaTheme::themeModeChanged, this, [=](ElaThemeType::ThemeMode themeMode) {
         _themeMode = themeMode;
@@ -70,9 +80,13 @@ void ElaNavigationStyle::drawPrimitive(PrimitiveElement element, const QStyleOpt
         // Item背景
         if (const QStyleOptionViewItem* vopt = qstyleoption_cast<const QStyleOptionViewItem*>(option))
         {
-            painter->save();
             QModelIndex index = vopt->index;
             ElaNavigationNode* node = static_cast<ElaNavigationNode*>(index.internalPointer());
+            if (node->getIsCategoryNode())
+            {
+                return;
+            }
+            painter->save();
             if (this->_opacityAnimationTargetNode && node->getParentNode() == this->_opacityAnimationTargetNode)
             {
                 painter->setOpacity(_pOpacity);
@@ -82,7 +96,7 @@ void ElaNavigationStyle::drawPrimitive(PrimitiveElement element, const QStyleOpt
             itemRect.setTop(itemRect.top() + 2);
             itemRect.setBottom(itemRect.bottom() - 2);
             QPainterPath path;
-            path.addRoundedRect(itemRect, 8, 8);
+            path.addRoundedRect(itemRect, 5, 5);
             if (vopt->state & QStyle::State_Selected)
             {
                 if (index == _pPressIndex)
@@ -109,7 +123,7 @@ void ElaNavigationStyle::drawPrimitive(PrimitiveElement element, const QStyleOpt
                 if (index == _pPressIndex)
                 {
                     // 点击时颜色
-                    painter->fillPath(path, ElaThemeColor(_themeMode, BasicSelectedHoverAlpha));
+                    painter->fillPath(path, ElaThemeColor(_themeMode, BasicPressAlpha));
                 }
                 else
                 {
@@ -175,13 +189,13 @@ void ElaNavigationStyle::drawControl(ControlElement element, const QStyleOption*
             {
                 painter->setPen(Qt::NoPen);
                 painter->setBrush(ElaThemeColor(_themeMode, PrimaryNormal));
-                painter->drawRoundedRect(QRectF(itemRect.x() + 3, itemRect.y() + _pSelectMarkTop, 3, itemRect.height() - _pSelectMarkTop - _pSelectMarkBottom), 3, 3);
+                painter->drawRoundedRect(QRectF(itemRect.x() + 3, itemRect.y() + _pSelectMarkTop, 3, itemRect.height() - _pSelectMarkTop - _pSelectMarkBottom), 1.5, 1.5);
             }
             if (node == _lastSelectedNode)
             {
                 painter->setPen(Qt::NoPen);
                 painter->setBrush(ElaThemeColor(_themeMode, PrimaryNormal));
-                painter->drawRoundedRect(QRectF(itemRect.x() + 3, itemRect.y() + _pLastSelectMarkTop, 3, itemRect.height() - _pLastSelectMarkTop - _pLastSelectMarkBottom), 3, 3);
+                painter->drawRoundedRect(QRectF(itemRect.x() + 3, itemRect.y() + _pLastSelectMarkTop, 3, itemRect.height() - _pLastSelectMarkTop - _pLastSelectMarkBottom), 1.5, 1.5);
             }
 
             // 图标绘制
@@ -192,13 +206,23 @@ void ElaNavigationStyle::drawControl(ControlElement element, const QStyleOption*
                 QFont iconFont = QFont("ElaAwesome");
                 iconFont.setPixelSize(17);
                 painter->setFont(iconFont);
-                painter->drawText(QRect(itemRect.x(), itemRect.y(), _iconAreaWidth, itemRect.height()), Qt::AlignCenter, QChar((unsigned short)node->getAwesome()));
+                painter->drawText(QRect(itemRect.x(), itemRect.y(), _iconAreaWidth, itemRect.height()), Qt::AlignCenter, QChar(node->getAwesome()));
                 painter->restore();
             }
 
             int viewWidth = widget->width();
             // 文字绘制
-            painter->setPen(vopt->index == _pPressIndex ? ElaThemeColor(_themeMode, BasicTextPress) : ElaThemeColor(_themeMode, BasicText));
+            if (node->getIsCategoryNode())
+            {
+                QFont categoryFont = painter->font();
+                categoryFont.setBold(true);
+                painter->setFont(categoryFont);
+                painter->setPen(ElaThemeColor(_themeMode, BasicTextCategory));
+            }
+            else
+            {
+                painter->setPen((vopt->index == _pPressIndex) ? ElaThemeColor(_themeMode, BasicTextPress) : ElaThemeColor(_themeMode, BasicText));
+            }
             QRect textRect;
             if (node->getAwesome() != ElaIconType::None)
             {
@@ -211,7 +235,7 @@ void ElaNavigationStyle::drawControl(ControlElement element, const QStyleOption*
             QString text = painter->fontMetrics().elidedText(node->getNodeTitle(), Qt::ElideRight, textRect.width());
             painter->drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, text);
 
-            if (viewWidth > 260)
+            if (viewWidth > _pNavigationView->getNavigationBarPrivate()->_pNavigationBarWidth - _indicatorIconAreaWidth)
             {
                 // 展开图标 KeyPoints
                 if (node->getIsExpanderNode())
@@ -219,7 +243,6 @@ void ElaNavigationStyle::drawControl(ControlElement element, const QStyleOption*
                     if (node->getIsHasChild())
                     {
                         QRectF expandIconRect(itemRect.right() - _indicatorIconAreaWidth, itemRect.y(), 17, itemRect.height());
-
                         painter->save();
                         QFont iconFont = QFont("ElaAwesome");
                         iconFont.setPixelSize(17);
@@ -243,7 +266,7 @@ void ElaNavigationStyle::drawControl(ControlElement element, const QStyleOption*
                             }
                         }
                         painter->translate(-expandIconRect.x() - (qreal)expandIconRect.width() / 2 + 1, -expandIconRect.y() - (qreal)expandIconRect.height() / 2);
-                        painter->drawText(expandIconRect, Qt::AlignVCenter, QChar((unsigned short)ElaIconType::AngleDown));
+                        painter->drawText(expandIconRect, Qt::AlignVCenter, QChar(ElaIconType::AngleDown));
                         painter->restore();
                     }
                     if (node->getIsChildHasKeyPoints())
@@ -263,11 +286,10 @@ void ElaNavigationStyle::drawControl(ControlElement element, const QStyleOption*
                         // KeyPoints
                         painter->save();
                         painter->setPen(Qt::NoPen);
-                        painter->setBrush(Qt::white);
-                        painter->drawEllipse(QPoint(itemRect.right() - 26, itemRect.y() + itemRect.height() / 2), 10, 10);
-                        painter->setBrush(ElaThemeColor(_themeMode, StatusDanger));
-                        painter->drawEllipse(QPoint(itemRect.right() - 26, itemRect.y() + itemRect.height() / 2), 9, 9);
-                        painter->setPen(QPen(Qt::white, 2));
+                        painter->setBrush(ElaThemeColor(_themeMode, PrimaryNormal));
+                        int keyPointRadius = 8;
+                        painter->drawEllipse(QPoint(itemRect.right() - 26, itemRect.y() + itemRect.height() / 2), keyPointRadius, keyPointRadius);
+                        painter->setPen(QPen(ElaThemeColor(_themeMode, BasicTextInvert), 2));
                         QFont font = painter->font();
                         font.setBold(true);
                         if (keyPoints > 99)
@@ -276,14 +298,14 @@ void ElaNavigationStyle::drawControl(ControlElement element, const QStyleOption*
                         }
                         if (keyPoints > 9)
                         {
-                            font.setPixelSize(11);
+                            font.setPixelSize(10);
                         }
                         else
                         {
-                            font.setPixelSize(12);
+                            font.setPixelSize(11);
                         }
                         painter->setFont(font);
-                        painter->drawText(keyPoints > 9 ? itemRect.right() - 33 : itemRect.right() - 30, itemRect.y() + itemRect.height() / 2 + 4, QString::number(keyPoints));
+                        painter->drawText(QRect(QPoint(itemRect.right() - 26 - keyPointRadius, itemRect.y() + itemRect.height() / 2 - keyPointRadius), QSize(2 * keyPointRadius, 2 * keyPointRadius)), Qt::AlignCenter, QString::number(keyPoints));
                         painter->restore();
                     }
                 }
@@ -327,19 +349,23 @@ void ElaNavigationStyle::navigationNodeStateChange(QVariantMap data)
         _opacityAnimationTargetNode = data.value("Expand").value<ElaNavigationNode*>();
         _expandAnimationTargetNode = _opacityAnimationTargetNode;
         QPropertyAnimation* nodeOpacityAnimation = new QPropertyAnimation(this, "pOpacity");
-        connect(nodeOpacityAnimation, &QPropertyAnimation::finished, this, [=]() { _opacityAnimationTargetNode = nullptr; });
+        connect(nodeOpacityAnimation, &QPropertyAnimation::finished, this, [=]() {
+            _opacityAnimationTargetNode = nullptr;
+        });
         connect(nodeOpacityAnimation, &QPropertyAnimation::valueChanged, this, [=](const QVariant& value) {
             _pNavigationView->viewport()->update();
         });
-        nodeOpacityAnimation->setDuration(600);
+        nodeOpacityAnimation->setDuration(480);
         nodeOpacityAnimation->setEasingCurve(QEasingCurve::InOutSine);
-        nodeOpacityAnimation->setKeyValueAt(0.4, 0);
+        nodeOpacityAnimation->setKeyValueAt(0.5, 0);
         nodeOpacityAnimation->setStartValue(0);
         nodeOpacityAnimation->setEndValue(1);
         nodeOpacityAnimation->start(QAbstractAnimation::DeleteWhenStopped);
 
         QPropertyAnimation* rotateAnimation = new QPropertyAnimation(this, "pRotate");
-        connect(rotateAnimation, &QPropertyAnimation::finished, this, [=]() { _expandAnimationTargetNode = nullptr; });
+        connect(rotateAnimation, &QPropertyAnimation::finished, this, [=]() {
+            _expandAnimationTargetNode = nullptr;
+        });
         connect(rotateAnimation, &QPropertyAnimation::valueChanged, this, [=](const QVariant& value) {
             _pNavigationView->viewport()->update();
         });
@@ -366,7 +392,8 @@ void ElaNavigationStyle::navigationNodeStateChange(QVariantMap data)
         QPropertyAnimation* rotateAnimation = new QPropertyAnimation(this, "pRotate");
         connect(rotateAnimation, &QPropertyAnimation::finished, this, [=]() {
             _pOpacity = 1;
-            _expandAnimationTargetNode = nullptr; });
+            _expandAnimationTargetNode = nullptr;
+        });
         connect(rotateAnimation, &QPropertyAnimation::valueChanged, this, [=](const QVariant& value) {
             _pNavigationView->viewport()->update();
         });
@@ -388,14 +415,14 @@ void ElaNavigationStyle::navigationNodeStateChange(QVariantMap data)
         _lastSelectedNode = data.value("LastSelectedNode").value<ElaNavigationNode*>();
         ElaNavigationNode* selectedNode = data.value("SelectedNode").value<ElaNavigationNode*>();
         bool direction = _compareItemY(selectedNode, _lastSelectedNode);
-        _pLastSelectMarkTop = 10;
-        _pLastSelectMarkBottom = 10;
-        _pSelectMarkTop = 10;
-        _pSelectMarkBottom = 10;
+        _pLastSelectMarkTop = 10.5;
+        _pLastSelectMarkBottom = 10.5;
+        _pSelectMarkTop = 10.5;
+        _pSelectMarkBottom = 10.5;
         if (direction)
         {
-            _lastSelectMarkTopAnimation->setStartValue(10);
-            _lastSelectMarkTopAnimation->setEndValue(0);
+            _lastSelectMarkTopAnimation->setStartValue(10.5);
+            _lastSelectMarkTopAnimation->setEndValue(0.0);
             _lastSelectMarkTopAnimation->start();
             _lastSelectMarkBottomAnimation->stop();
             _selectMarkTopAnimation->stop();
@@ -403,8 +430,8 @@ void ElaNavigationStyle::navigationNodeStateChange(QVariantMap data)
         }
         else
         {
-            _lastSelectMarkBottomAnimation->setStartValue(10);
-            _lastSelectMarkBottomAnimation->setEndValue(0);
+            _lastSelectMarkBottomAnimation->setStartValue(10.5);
+            _lastSelectMarkBottomAnimation->setEndValue(0.0);
             _lastSelectMarkBottomAnimation->start();
             _lastSelectMarkTopAnimation->stop();
             _selectMarkBottomAnimation->stop();

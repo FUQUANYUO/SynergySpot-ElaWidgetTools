@@ -1,11 +1,13 @@
 #include "ElaSpinBoxPrivate.h"
 
+#include "ElaMenu.h"
+#include "ElaSpinBox.h"
+#include "ElaTheme.h"
+
 #include <QClipboard>
 #include <QGuiApplication>
 #include <QLineEdit>
-
-#include "ElaMenu.h"
-#include "ElaSpinBox.h"
+#include <QTimer>
 ElaSpinBoxPrivate::ElaSpinBoxPrivate(QObject* parent)
     : QObject{parent}
 {
@@ -13,6 +15,16 @@ ElaSpinBoxPrivate::ElaSpinBoxPrivate(QObject* parent)
 
 ElaSpinBoxPrivate::~ElaSpinBoxPrivate()
 {
+}
+
+void ElaSpinBoxPrivate::onThemeChanged(ElaThemeType::ThemeMode themeMode)
+{
+    Q_Q(ElaSpinBox);
+    _themeMode = themeMode;
+    QPalette palette;
+    palette.setColor(QPalette::Base, Qt::transparent);
+    palette.setColor(QPalette::Text, ElaThemeColor(_themeMode, BasicText));
+    q->lineEdit()->setPalette(palette);
 }
 
 ElaMenu* ElaSpinBoxPrivate::_createStandardContextMenu()

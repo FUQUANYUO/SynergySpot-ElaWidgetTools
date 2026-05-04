@@ -2,7 +2,8 @@
 
 #include "ElaApplication.h"
 #include "ElaLineEdit.h"
-
+#include "ElaTheme.h"
+#include <QTimer>
 ElaLineEditPrivate::ElaLineEditPrivate(QObject* parent)
     : QObject{parent}
 {
@@ -40,18 +41,8 @@ void ElaLineEditPrivate::onThemeChanged(ElaThemeType::ThemeMode themeMode)
 {
     Q_Q(ElaLineEdit);
     _themeMode = themeMode;
-    if (themeMode == ElaThemeType::Light)
-    {
-        QPalette palette;
-        palette.setColor(QPalette::Text, Qt::black);
-        palette.setColor(QPalette::PlaceholderText, QColor(0x00, 0x00, 0x00, 128));
-        q->setPalette(palette);
-    }
-    else
-    {
-        QPalette palette;
-        palette.setColor(QPalette::Text, Qt::white);
-        palette.setColor(QPalette::PlaceholderText, QColor(0xBA, 0xBA, 0xBA));
-        q->setPalette(palette);
-    }
+    QPalette palette = q->palette();
+    palette.setColor(QPalette::Text, ElaThemeColor(_themeMode, BasicText));
+    palette.setColor(QPalette::PlaceholderText, _themeMode == ElaThemeType::Light ? QColor(0x00, 0x00, 0x00, 128) : QColor(0xBA, 0xBA, 0xBA));
+    q->setPalette(palette);
 }

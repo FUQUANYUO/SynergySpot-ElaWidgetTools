@@ -3,8 +3,7 @@
 #include <QObject>
 #include <QVector>
 
-#include "Def.h"
-#include "stdafx.h"
+#include "ElaDef.h"
 class ElaComboBoxStyle;
 class ElaComboBoxView;
 class ElaMultiSelectComboBox;
@@ -17,7 +16,7 @@ class ElaMultiSelectComboBoxPrivate : public QObject
     Q_PROPERTY_CREATE(qreal, ExpandMarkWidth)
 public:
     explicit ElaMultiSelectComboBoxPrivate(QObject* parent = nullptr);
-    ~ElaMultiSelectComboBoxPrivate();
+    ~ElaMultiSelectComboBoxPrivate() override;
     Q_SLOT void onItemPressed(const QModelIndex& index);
 
 private:

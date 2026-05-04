@@ -8,8 +8,11 @@
 #include "ElaTheme.h"
 ElaTabBarStyle::ElaTabBarStyle(QStyle* style)
 {
+    _pTabSize = QSize(220, 35);
     _themeMode = eTheme->getThemeMode();
-    connect(eTheme, &ElaTheme::themeModeChanged, this, [=](ElaThemeType::ThemeMode themeMode) { _themeMode = themeMode; });
+    connect(eTheme, &ElaTheme::themeModeChanged, this, [=](ElaThemeType::ThemeMode themeMode) {
+        _themeMode = themeMode;
+    });
 }
 
 ElaTabBarStyle::~ElaTabBarStyle()
@@ -57,7 +60,7 @@ void ElaTabBarStyle::drawPrimitive(PrimitiveElement pe, const QStyleOption* opt,
         iconFont.setPixelSize(16);
         p->setFont(iconFont);
         p->setPen(ElaThemeColor(_themeMode, BasicText));
-        p->drawText(opt->rect, Qt::AlignCenter, QChar((unsigned short)ElaIconType::Xmark));
+        p->drawText(opt->rect, Qt::AlignCenter, QChar(ElaIconType::Xmark));
         p->restore();
         return;
     }
@@ -75,6 +78,15 @@ void ElaTabBarStyle::drawControl(ControlElement element, const QStyleOption* opt
     int topRadius = 7;
     switch (element)
     {
+    case QStyle::CE_TabBarTab:
+    {
+        if (const QStyleOptionTab* topt = qstyleoption_cast<const QStyleOptionTab*>(option))
+        {
+            drawControl(CE_TabBarTabShape, topt, painter, widget);
+            drawControl(CE_TabBarTabLabel, topt, painter, widget);
+            return;
+        }
+    }
     case QStyle::CE_TabBarTabShape:
     {
         //背景绘制
@@ -88,11 +100,8 @@ void ElaTabBarStyle::drawControl(ControlElement element, const QStyleOption* opt
             {
                 //选中背景绘制
                 tabRect.setLeft(tabRect.left() - margin);
-                if (topt->position != QStyleOptionTab::End)
-                {
-                    tabRect.setRight(tabRect.right() + margin + 1);
-                }
-                painter->setBrush(ElaThemeColor(_themeMode, BasicSelectedAlpha));
+                tabRect.setRight(tabRect.right() + margin + 1);
+                painter->setBrush(topt->state.testFlag(QStyle::State_Sunken) ? ElaThemeColor(_themeMode, BasicSelectedHover) : ElaThemeColor(_themeMode, BasicSelectedAlpha));
                 QPainterPath path;
                 path.moveTo(tabRect.x(), tabRect.bottom() + 1);
                 path.arcTo(QRectF(tabRect.x() - margin, tabRect.bottom() - margin * 2 + 1, margin * 2, margin * 2), -90, 90);
@@ -106,6 +115,10 @@ void ElaTabBarStyle::drawControl(ControlElement element, const QStyleOption* opt
                 path.lineTo(tabRect.x(), tabRect.bottom() + 10);
                 path.closeSubpath();
                 painter->drawPath(path);
+                // 选中绘制
+                painter->setPen(Qt::NoPen);
+                painter->setBrush(ElaThemeColor(_themeMode, PrimaryNormal));
+                painter->drawRoundedRect(QRectF(tabRect.left() + margin + 7, tabRect.y() + 7, 3, tabRect.height() - 14), 2, 2);
             }
             else
             {
@@ -120,14 +133,6 @@ void ElaTabBarStyle::drawControl(ControlElement element, const QStyleOption* opt
                 tabRect.setHeight(tabRect.height() + 10);
                 painter->drawRoundedRect(tabRect, 0, 0);
                 tabRect.setHeight(tabRect.height() - 10);
-            }
-
-            //间隔符绘制
-            if (!topt->state.testFlag(QStyle::State_Selected) && topt->position != QStyleOptionTab::End && topt->selectedPosition != QStyleOptionTab::NextIsSelected)
-            {
-                painter->setPen(Qt::NoPen);
-                painter->setBrush(ElaThemeColor(_themeMode, PrimaryNormal));
-                painter->drawRoundedRect(QRectF(tabRect.right() - 3, tabRect.y() + 7, 3, tabRect.height() - 14), 2, 2);
             }
             painter->restore();
             return;
@@ -185,7 +190,7 @@ QSize ElaTabBarStyle::sizeFromContents(ContentsType type, const QStyleOption* op
     {
     case CT_TabBarTab:
     {
-        return QSize(220, 35);
+        return _pTabSize;
     }
     default:
     {
@@ -201,6 +206,8 @@ QRect ElaTabBarStyle::subElementRect(SubElement element, const QStyleOption* opt
     {
     case QStyle::SE_TabBarScrollLeftButton:
     case QStyle::SE_TabBarScrollRightButton:
+    case QStyle::SE_TabBarTearIndicatorLeft:
+    case QStyle::SE_TabBarTearIndicatorRight:
     {
         return QRect();
     }

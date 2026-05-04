@@ -3,7 +3,7 @@
 
 #include <QProxyStyle>
 
-#include "Def.h"
+#include "ElaDef.h"
 class QStyleOptionToolButton;
 class ElaToolButtonStyle : public QProxyStyle
 {
@@ -15,7 +15,7 @@ class ElaToolButtonStyle : public QProxyStyle
 
 public:
     explicit ElaToolButtonStyle(QStyle* style = nullptr);
-    ~ElaToolButtonStyle();
+    ~ElaToolButtonStyle() override;
     void drawComplexControl(ComplexControl control, const QStyleOptionComplex* option, QPainter* painter, const QWidget* widget = nullptr) const override;
     QSize sizeFromContents(ContentsType type, const QStyleOption* option, const QSize& size, const QWidget* widget) const override;
 

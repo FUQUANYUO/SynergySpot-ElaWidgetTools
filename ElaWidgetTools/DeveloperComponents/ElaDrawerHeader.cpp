@@ -44,7 +44,7 @@ void ElaDrawerHeader::setHeaderWidget(QWidget* widget)
     _headerWidget = widget;
 }
 
-void ElaDrawerHeader::doExpandOrCollpaseAnimation()
+void ElaDrawerHeader::doExpandOrCollapseAnimation()
 {
     QPropertyAnimation* rotateAnimation = new QPropertyAnimation(this, "pExpandIconRotate");
     connect(rotateAnimation, &QPropertyAnimation::valueChanged, this, [=](const QVariant& value) {
@@ -94,7 +94,7 @@ void ElaDrawerHeader::mouseReleaseEvent(QMouseEvent* event)
         _isPressed = false;
         _pIsExpand = !_pIsExpand;
         //指示器动画
-        doExpandOrCollpaseAnimation();
+        doExpandOrCollapseAnimation();
         Q_EMIT drawerHeaderClicked(_pIsExpand);
     }
     QWidget::mouseReleaseEvent(event);
@@ -142,7 +142,7 @@ void ElaDrawerHeader::paintEvent(QPaintEvent* event)
     painter.translate(expandIconRect.x() + (qreal)expandIconRect.width() / 2 - 2, expandIconRect.y() + (qreal)expandIconRect.height() / 2);
     painter.rotate(_pExpandIconRotate);
     painter.translate(-expandIconRect.x() - (qreal)expandIconRect.width() / 2 + 2, -expandIconRect.y() - (qreal)expandIconRect.height() / 2);
-    painter.drawText(expandIconRect, Qt::AlignVCenter, QChar((unsigned short)ElaIconType::AngleDown));
+    painter.drawText(expandIconRect, Qt::AlignVCenter, QChar(ElaIconType::AngleDown));
 
     painter.restore();
 }

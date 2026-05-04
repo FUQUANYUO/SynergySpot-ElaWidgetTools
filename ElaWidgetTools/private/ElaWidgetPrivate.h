@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include "Def.h"
+#include "ElaDef.h"
 class ElaWidget;
 class ElaAppBar;
 class ElaWidgetPrivate : public QObject
@@ -12,11 +12,11 @@ class ElaWidgetPrivate : public QObject
     Q_D_CREATE(ElaWidget)
 public:
     explicit ElaWidgetPrivate(QObject* parent = nullptr);
-    ~ElaWidgetPrivate();
+    ~ElaWidgetPrivate() override;
 
 private:
     ElaThemeType::ThemeMode _themeMode;
-    bool _isEnableMica;
+    ElaApplicationType::WindowDisplayMode _windowDisplayMode;
     ElaAppBar* _appBar{nullptr};
 };
 

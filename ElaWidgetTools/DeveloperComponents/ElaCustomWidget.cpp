@@ -11,6 +11,10 @@ ElaCustomWidget::ElaCustomWidget(QWidget* parent)
 {
     resize(500, 500); // 默认宽高
     setObjectName("ElaCustomWidget");
+    setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint | Qt::WindowFullscreenButtonHint);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 5, 3) || QT_VERSION > QT_VERSION_CHECK(6, 6, 1))
+    setStyleSheet("#ElaCustomWidget{background-color:transparent;}");
+#endif
     // 自定义AppBar
     _appBar = new ElaAppBar(this);
     _appBar->setWindowButtonFlags(ElaAppBarType::MinimizeButtonHint | ElaAppBarType::MaximizeButtonHint | ElaAppBarType::CloseButtonHint);
@@ -23,17 +27,18 @@ ElaCustomWidget::ElaCustomWidget(QWidget* parent)
         update();
     });
 
-    _isEnableMica = eApp->getIsEnableMica();
-    connect(eApp, &ElaApplication::pIsEnableMicaChanged, this, [=]() {
-        _isEnableMica = eApp->getIsEnableMica();
+    _windowDisplayMode = eApp->getWindowDisplayMode();
+    connect(eApp, &ElaApplication::pWindowDisplayModeChanged, this, [=]() {
+        _windowDisplayMode = eApp->getWindowDisplayMode();
         update();
     });
-    eApp->syncMica(this);
+    eApp->syncWindowDisplayMode(this);
     setAttribute(Qt::WA_DeleteOnClose);
 }
 
 ElaCustomWidget::~ElaCustomWidget()
 {
+    eApp->syncWindowDisplayMode(this, false);
 }
 
 void ElaCustomWidget::setCentralWidget(QWidget* widget)
@@ -49,7 +54,11 @@ void ElaCustomWidget::setCentralWidget(QWidget* widget)
 
 void ElaCustomWidget::paintEvent(QPaintEvent* event)
 {
-    if (!_isEnableMica)
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 3) && QT_VERSION <= QT_VERSION_CHECK(6, 6, 1))
+    if (_windowDisplayMode != ElaApplicationType::WindowDisplayMode::ElaMica)
+#else
+    if (_windowDisplayMode == ElaApplicationType::WindowDisplayMode::Normal)
+#endif
     {
         QPainter painter(this);
         painter.save();

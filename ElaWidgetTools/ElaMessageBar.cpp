@@ -32,9 +32,10 @@ ElaMessageBar::ElaMessageBar(ElaMessageBarType::PositionPolicy policy, ElaMessag
     {
     case ElaMessageBarType::Success:
     {
-        d->_closeButton->setLightHoverColor(QColor(0xE6, 0xFC, 0xE3));
-        d->_closeButton->setDarkHoverColor(QColor(0xE6, 0xFC, 0xE3));
+        d->_closeButton->setLightHoverColor(QColor(0xCA, 0xDE, 0xC8));
+        d->_closeButton->setDarkHoverColor(QColor(0xCA, 0xDE, 0xC8));
         d->_closeButton->setDarkIconColor(Qt::black);
+        d->_closeButton->setDarkHoverIconColor(Qt::black);
         break;
     }
     case ElaMessageBarType::Warning:
@@ -43,25 +44,28 @@ ElaMessageBar::ElaMessageBar(ElaMessageBarType::PositionPolicy policy, ElaMessag
         d->_closeButton->setDarkHoverColor(QColor(0x5E, 0x4C, 0x22));
         d->_closeButton->setLightIconColor(Qt::white);
         d->_closeButton->setDarkIconColor(Qt::white);
+        d->_closeButton->setLightHoverIconColor(Qt::white);
         break;
     }
     case ElaMessageBarType::Information:
     {
-        d->_closeButton->setLightHoverColor(QColor(0xEB, 0xEB, 0xEB));
-        d->_closeButton->setDarkHoverColor(QColor(0xEB, 0xEB, 0xEB));
+        d->_closeButton->setLightHoverColor(QColor(0xDE, 0xDE, 0xDE));
+        d->_closeButton->setDarkHoverColor(QColor(0xDE, 0xDE, 0xDE));
         d->_closeButton->setDarkIconColor(Qt::black);
+        d->_closeButton->setDarkHoverIconColor(Qt::black);
         break;
     }
     case ElaMessageBarType::Error:
     {
-        d->_closeButton->setLightHoverColor(QColor(0xF7, 0xE1, 0xE4));
-        d->_closeButton->setDarkHoverColor(QColor(0xF7, 0xE1, 0xE4));
+        d->_closeButton->setLightHoverColor(QColor(0xF2, 0xDD, 0xE0));
+        d->_closeButton->setDarkHoverColor(QColor(0xF2, 0xDD, 0xE0));
         d->_closeButton->setDarkIconColor(Qt::black);
+        d->_closeButton->setDarkHoverIconColor(Qt::black);
         break;
     }
     }
     d->_closeButton->setBorderRadius(5);
-    connect(d->_closeButton, &ElaIconButton::clicked, d, &ElaMessageBarPrivate::onCloseButtonClicked);
+    connect(d->_closeButton, &ElaIconButton::clicked, d, &ElaMessageBarPrivate::messageBarEnd);
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 10, 0);
     mainLayout->addStretch();
@@ -81,7 +85,7 @@ void ElaMessageBar::success(ElaMessageBarType::PositionPolicy policy, QString ti
     if (!parent)
     {
         QList<QWidget*> widgetList = QApplication::topLevelWidgets();
-        for (auto widget : widgetList)
+        for (auto widget: widgetList)
         {
             if (widget->property("ElaBaseClassName").toString() == "ElaWindow")
             {
@@ -103,7 +107,7 @@ void ElaMessageBar::warning(ElaMessageBarType::PositionPolicy policy, QString ti
     if (!parent)
     {
         QList<QWidget*> widgetList = QApplication::topLevelWidgets();
-        for (auto widget : widgetList)
+        for (auto widget: widgetList)
         {
             if (widget->property("ElaBaseClassName").toString() == "ElaWindow")
             {
@@ -124,7 +128,7 @@ void ElaMessageBar::information(ElaMessageBarType::PositionPolicy policy, QStrin
     if (!parent)
     {
         QList<QWidget*> widgetList = QApplication::topLevelWidgets();
-        for (auto widget : widgetList)
+        for (auto widget: widgetList)
         {
             if (widget->property("ElaBaseClassName").toString() == "ElaWindow")
             {
@@ -145,7 +149,7 @@ void ElaMessageBar::error(ElaMessageBarType::PositionPolicy policy, QString titl
     if (!parent)
     {
         QList<QWidget*> widgetList = QApplication::topLevelWidgets();
-        for (auto widget : widgetList)
+        for (auto widget: widgetList)
         {
             if (widget->property("ElaBaseClassName").toString() == "ElaWindow")
             {
@@ -213,7 +217,7 @@ void ElaMessageBar::paintEvent(QPaintEvent* event)
     font.setWeight(QFont::Light);
     font.setPixelSize(15);
     painter.setFont(font);
-    painter.drawText(QRect(d->_leftPadding + d->_titleLeftSpacing + titleTextWidth + d->_textLeftSpacing, 0, width() - (d->_leftPadding + d->_titleLeftSpacing + titleTextWidth + d->_textLeftSpacing + d->_closeButtonWidth + d->_closeButtonLeftRightMargin / 2), height()), textFlags, d->_text);
+    painter.drawText(QRect(d->_leftPadding + d->_titleLeftSpacing + titleTextWidth + d->_textLeftSpacing, 0, width() - (d->_leftPadding + d->_titleLeftSpacing + titleTextWidth + d->_textLeftSpacing + d->_closeButtonWidth + d->_closeButtonLeftRightMargin / 2), height() - d->_timePercentHeight), textFlags, d->_text);
     int textHeight = painter.fontMetrics().boundingRect(QRect(d->_leftPadding + d->_titleLeftSpacing + titleTextWidth + d->_textLeftSpacing, 0, width() - (d->_leftPadding + d->_titleLeftSpacing + titleTextWidth + d->_textLeftSpacing + d->_closeButtonWidth + d->_closeButtonLeftRightMargin), height()), textFlags, d->_text).height();
     if (textHeight >= minimumHeight() - 20)
     {

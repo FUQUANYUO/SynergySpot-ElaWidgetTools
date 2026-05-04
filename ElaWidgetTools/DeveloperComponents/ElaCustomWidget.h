@@ -3,8 +3,8 @@
 
 #include <QDialog>
 
-#include "Def.h"
 #include "ElaAppBar.h"
+#include "ElaDef.h"
 
 class QVBoxLayout;
 class ElaCustomWidget : public QDialog
@@ -13,7 +13,7 @@ class ElaCustomWidget : public QDialog
     Q_TAKEOVER_NATIVEEVENT_H
 public:
     explicit ElaCustomWidget(QWidget* parent = nullptr);
-    ~ElaCustomWidget();
+    ~ElaCustomWidget() override;
 
     void setCentralWidget(QWidget* widget);
 
@@ -25,7 +25,7 @@ protected:
 
 private:
     ElaThemeType::ThemeMode _themeMode;
-    bool _isEnableMica;
+    ElaApplicationType::WindowDisplayMode _windowDisplayMode;
 };
 
 #endif // ELACUSTOMWIDGET_H

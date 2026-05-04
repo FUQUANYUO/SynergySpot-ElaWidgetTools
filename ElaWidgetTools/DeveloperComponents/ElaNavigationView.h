@@ -1,18 +1,20 @@
 #ifndef ELANAVIGATIONVIEW_H
 #define ELANAVIGATIONVIEW_H
 
+#include "ElaDef.h"
+#include "ElaNavigationBarPrivate.h"
 #include <QObject>
 #include <QTreeView>
-
 class ElaScrollBar;
 class ElaNavigationStyle;
 class ElaToolTip;
 class ElaNavigationView : public QTreeView
 {
     Q_OBJECT
+    Q_PRIVATE_CREATE(const ElaNavigationBarPrivate*, NavigationBarPrivate)
 public:
     explicit ElaNavigationView(QWidget* parent = nullptr);
-    ~ElaNavigationView();
+    ~ElaNavigationView() override;
     void navigationNodeStateChange(QVariantMap data);
 
     Q_SLOT void onCustomContextMenuRequested(const QPoint& pos);
@@ -29,6 +31,7 @@ protected:
 private:
     ElaNavigationStyle* _navigationStyle{nullptr};
     ElaToolTip* _compactToolTip{nullptr};
+    void _doCompactToolTip();
 };
 
 #endif // ELANAVIGATIONVIEW_H

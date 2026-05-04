@@ -8,30 +8,30 @@ ElaDrawerContainer::ElaDrawerContainer(QWidget* parent)
     : QWidget(parent)
 {
     _pBorderRadius = 6;
+    _pOpacity = 0;
+    _pContainerPix = QPixmap();
     setObjectName("ElaDrawerContainer");
     setStyleSheet("#ElaDrawerContainer{background-color:transparent;}");
 
     _mainLayout = new QVBoxLayout(this);
+    _mainLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
     _mainLayout->setContentsMargins(0, 0, 0, 0);
 
     _containerWidget = new QWidget(this);
     _containerWidget->setObjectName("ElaDrawerContainerWidget");
     _containerWidget->setStyleSheet("#ElaDrawerContainerWidget{background-color:transparent;}");
-    setMaximumHeight(0);
-
+    _containerWidget->setVisible(false);
+    
     _containerLayout = new QVBoxLayout(_containerWidget);
     _containerLayout->setContentsMargins(0, 0, 0, 0);
     _containerLayout->setSpacing(0);
 
     _mainLayout->addWidget(_containerWidget);
 
-    _opacityEffect = new QGraphicsOpacityEffect(this);
-    _opacityEffect->setOpacity(0);
-    setGraphicsEffect(_opacityEffect);
-
     _themeMode = eTheme->getThemeMode();
     connect(eTheme, &ElaTheme::themeModeChanged, this, [=](ElaThemeType::ThemeMode themeMode) {
         _themeMode = themeMode;
+        update();
     });
 }
 
@@ -65,41 +65,56 @@ void ElaDrawerContainer::doDrawerAnimation(bool isExpand)
     {
         return;
     }
-    QPropertyAnimation* heightAnimation = new QPropertyAnimation(this, "maximumHeight");
-    connect(heightAnimation, &QPropertyAnimation::valueChanged, this, [=](const QVariant& value) {
-        setMinimumHeight(value.toUInt());
+    _containerWidget->setVisible(true);
+    _mainLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
+    int expandHeight = height();
+    _isShowBorder = true;
+    setFixedHeight(expandHeight);
+    _pContainerPix = grab(rect());
+    QPropertyAnimation* opacityAnimation = new QPropertyAnimation(this, "pOpacity");
+    connect(opacityAnimation, &QPropertyAnimation::valueChanged, this, [=](const QVariant& value) {
+        update();
     });
-    heightAnimation->setEasingCurve(QEasingCurve::OutCubic);
-    heightAnimation->setDuration(isExpand ? 300 : 450);
-    heightAnimation->setStartValue(maximumHeight());
-    heightAnimation->setEndValue(isExpand ? 200 : 0);
-    heightAnimation->start(QPropertyAnimation::DeleteWhenStopped);
-
-    QPropertyAnimation* opacityAnimation = new QPropertyAnimation(_opacityEffect, "opacity");
-    opacityAnimation->setEasingCurve(isExpand ? QEasingCurve::InCubic : QEasingCurve::OutCubic);
-    opacityAnimation->setDuration(isExpand ? 300 : 0);
-    opacityAnimation->setStartValue(_opacityEffect->opacity());
+    connect(opacityAnimation, &QPropertyAnimation::finished, this, [=]() {
+        _pContainerPix = QPixmap();
+        _isShowBorder = isExpand;
+        _containerWidget->setVisible(isExpand);
+        _mainLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
+    });
+    opacityAnimation->setEasingCurve(QEasingCurve::OutCubic);
+    opacityAnimation->setDuration(300);
+    opacityAnimation->setStartValue(_pOpacity);
     opacityAnimation->setEndValue(isExpand ? 1 : 0);
     opacityAnimation->start(QPropertyAnimation::DeleteWhenStopped);
+    _containerWidget->setVisible(false);
+    _isShowBorder = false;
 }
 
 void ElaDrawerContainer::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
     painter.save();
-    painter.setRenderHint(QPainter::Antialiasing);
-    // 背景绘制
-    painter.setPen(ElaThemeColor(_themeMode, BasicBorder));
-    painter.setBrush(ElaThemeColor(_themeMode, BasicBaseAlpha));
-    QRect foregroundRect(1, 1 - 2 * _pBorderRadius, width() - 2, height() - 2 + 2 * _pBorderRadius);
-    painter.drawRoundedRect(foregroundRect, _pBorderRadius, _pBorderRadius);
-    // 分割线绘制
-    int drawerHeight = 0;
-    for (int i = 0; i < _drawerWidgetList.count() - 1; i++)
+    painter.setRenderHints(QPainter::Antialiasing);
+    if (_isShowBorder)
     {
-        QWidget* drawerWidget = _drawerWidgetList[i];
-        drawerHeight += drawerWidget->height();
-        painter.drawLine(0, drawerHeight, width(), drawerHeight);
+        // 背景绘制
+        painter.setPen(ElaThemeColor(_themeMode, BasicBorder));
+        painter.setBrush(ElaThemeColor(_themeMode, BasicBaseAlpha));
+        QRect foregroundRect(1, 1 - 2 * _pBorderRadius, width() - 2, height() - 2 + 2 * _pBorderRadius);
+        painter.drawRoundedRect(foregroundRect, _pBorderRadius, _pBorderRadius);
+        // 分割线绘制
+        int drawerHeight = 0;
+        for (int i = 0; i < _drawerWidgetList.count() - 1; i++)
+        {
+            QWidget* drawerWidget = _drawerWidgetList[i];
+            drawerHeight += drawerWidget->height();
+            painter.drawLine(0, drawerHeight, width(), drawerHeight);
+        }
+    }
+    if (!_pContainerPix.isNull())
+    {
+        painter.setOpacity(_pOpacity);
+        painter.drawPixmap(QRect(0, -height() * (1 - _pOpacity), width(), height()), _pContainerPix);
     }
     painter.restore();
 }

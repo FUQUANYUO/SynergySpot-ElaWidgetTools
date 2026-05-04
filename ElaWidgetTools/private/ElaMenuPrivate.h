@@ -5,7 +5,7 @@
 #include <QPixmap>
 #include <QPoint>
 
-#include "stdafx.h"
+#include "ElaProperty.h"
 class ElaMenu;
 class ElaMenuStyle;
 class ElaMenuPrivate : public QObject
@@ -15,7 +15,7 @@ class ElaMenuPrivate : public QObject
     Q_PROPERTY_CREATE(int, AnimationImagePosY)
 public:
     explicit ElaMenuPrivate(QObject* parent = nullptr);
-    ~ElaMenuPrivate();
+    ~ElaMenuPrivate() override;
 
 private:
     QPixmap _animationPix;

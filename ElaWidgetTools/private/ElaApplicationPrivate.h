@@ -5,14 +5,15 @@
 #include <QIcon>
 #include <QObject>
 
-#include "Def.h"
+#include "ElaDef.h"
 class ElaApplication;
 class ElaApplicationPrivate : public QObject
 {
     Q_OBJECT
     Q_D_CREATE(ElaApplication)
-    Q_PROPERTY_CREATE_D(bool, IsEnableMica)
-    Q_PROPERTY_CREATE_D(QString, MicaImagePath)
+    Q_PROPERTY_CREATE_D(ElaApplicationType::WindowDisplayMode, WindowDisplayMode)
+    Q_PROPERTY_CREATE_D(QString, ElaMicaImagePath)
+
 public:
     explicit ElaApplicationPrivate(QObject* parent = nullptr);
     ~ElaApplicationPrivate() override;
@@ -33,6 +34,7 @@ private:
     QRect _calculateWindowVirtualGeometry(QWidget* widget);
     void _updateMica(QWidget* widget, bool isProcessEvent = true);
     void _updateAllMicaWidget();
+    void _resetAllMicaWidget();
 };
 
 #endif // ELAAPPLICATIONPRIVATE_H

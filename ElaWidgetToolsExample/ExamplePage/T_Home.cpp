@@ -8,11 +8,11 @@
 #include <QVBoxLayout>
 
 #include "ElaAcrylicUrlCard.h"
+#include "ElaActionCommander.h"
 #include "ElaFlowLayout.h"
 #include "ElaImageCard.h"
 #include "ElaMenu.h"
 #include "ElaMessageBar.h"
-#include "ElaNavigationRouter.h"
 #include "ElaPopularCard.h"
 #include "ElaScrollArea.h"
 #include "ElaText.h"
@@ -32,14 +32,13 @@ T_Home::T_Home(QWidget* parent)
     titleText->setTextPixelSize(35);
 
     QVBoxLayout* titleLayout = new QVBoxLayout();
-    titleLayout->setContentsMargins(30, 60, 0, 0);
+    titleLayout->setContentsMargins(30, 10, 0, 0);
     titleLayout->addWidget(desText);
     titleLayout->addWidget(titleText);
 
     ElaImageCard* backgroundCard = new ElaImageCard(this);
     backgroundCard->setBorderRadius(10);
-    backgroundCard->setFixedHeight(400);
-    backgroundCard->setMaximumAspectRatio(1.7);
+    backgroundCard->setFixedHeight(340);
     backgroundCard->setCardImage(QImage(":/Resource/Image/Home_Background.png"));
 
     ElaAcrylicUrlCard* urlCard1 = new ElaAcrylicUrlCard(this);
@@ -63,7 +62,7 @@ T_Home::T_Home(QWidget* parent)
     urlCard2->setUrl("https://space.bilibili.com/21256707");
     urlCard2->setCardPixmap(QPixmap(":/Resource/Image/Moon.jpg"));
     urlCard2->setTitle("ElaWidgetTool");
-    urlCard2->setSubTitle("8009963@qq.com");
+    urlCard2->setSubTitle("80985@qq.com");
 
     ElaScrollArea* cardScrollArea = new ElaScrollArea(this);
     cardScrollArea->setWidgetResizable(true);
@@ -109,7 +108,9 @@ T_Home::T_Home(QWidget* parent)
     homeCard->setCardFloatPixmap(QPixmap(":/Resource/Image/IARC/IARC_7+.svg.png"));
 
     ElaPopularCard* homeCard1 = new ElaPopularCard(this);
-    connect(homeCard1, &ElaPopularCard::popularCardButtonClicked, this, [=]() { Q_EMIT elaScreenNavigation(); });
+    connect(homeCard1, &ElaPopularCard::popularCardButtonClicked, this, [=]() {
+        Q_EMIT elaScreenNavigation();
+    });
     homeCard1->setTitle("ElaScreen");
     homeCard1->setSubTitle("5.0⭐ 实用程序与工具");
     homeCard1->setCardPixmap(QPixmap(":/Resource/Image/control/AutomationProperties.png"));
@@ -118,7 +119,9 @@ T_Home::T_Home(QWidget* parent)
     homeCard1->setCardFloatPixmap(QPixmap(":/Resource/Image/IARC/IARC_7+.svg.png"));
 
     ElaPopularCard* homeCard2 = new ElaPopularCard(this);
-    connect(homeCard2, &ElaPopularCard::popularCardButtonClicked, this, [=]() { Q_EMIT elaSceneNavigation(); });
+    connect(homeCard2, &ElaPopularCard::popularCardButtonClicked, this, [=]() {
+        Q_EMIT elaSceneNavigation();
+    });
     homeCard2->setTitle("ElaScene");
     homeCard2->setSubTitle("5.0⭐ 实用程序与工具");
     homeCard2->setCardPixmap(QPixmap(":/Resource/Image/control/Canvas.png"));
@@ -127,7 +130,9 @@ T_Home::T_Home(QWidget* parent)
     homeCard2->setCardFloatPixmap(QPixmap(":/Resource/Image/IARC/IARC_7+.svg.png"));
 
     ElaPopularCard* homeCard3 = new ElaPopularCard(this);
-    connect(homeCard3, &ElaPopularCard::popularCardButtonClicked, this, [=]() { Q_EMIT elaBaseComponentNavigation(); });
+    connect(homeCard3, &ElaPopularCard::popularCardButtonClicked, this, [=]() {
+        Q_EMIT elaBaseComponentNavigation();
+    });
     homeCard3->setTitle("ElaBaseComponent");
     homeCard3->setSubTitle("5.0⭐ 实用程序与工具");
     homeCard3->setCardPixmap(QPixmap(":/Resource/Image/control/StandardUICommand.png"));
@@ -136,7 +141,9 @@ T_Home::T_Home(QWidget* parent)
     homeCard3->setCardFloatPixmap(QPixmap(":/Resource/Image/IARC/IARC_7+.svg.png"));
 
     ElaPopularCard* homeCard4 = new ElaPopularCard(this);
-    connect(homeCard4, &ElaPopularCard::popularCardButtonClicked, this, [=]() { Q_EMIT elaCardNavigation(); });
+    connect(homeCard4, &ElaPopularCard::popularCardButtonClicked, this, [=]() {
+        Q_EMIT elaCardNavigation();
+    });
     homeCard4->setTitle("ElaCard");
     homeCard4->setSubTitle("5.0⭐ 实用程序与工具");
     homeCard4->setCardPixmap(QPixmap(":/Resource/Image/control/FlipView.png"));
@@ -145,7 +152,9 @@ T_Home::T_Home(QWidget* parent)
     homeCard4->setCardFloatPixmap(QPixmap(":/Resource/Image/IARC/IARC_7+.svg.png"));
 
     ElaPopularCard* homeCard5 = new ElaPopularCard(this);
-    connect(homeCard5, &ElaPopularCard::popularCardButtonClicked, this, [=]() { Q_EMIT elaIconNavigation(); });
+    connect(homeCard5, &ElaPopularCard::popularCardButtonClicked, this, [=]() {
+        Q_EMIT elaIconNavigation();
+    });
     homeCard5->setTitle("ElaIcon");
     homeCard5->setSubTitle("5.0⭐ 实用程序与工具");
     homeCard5->setCardPixmap(QPixmap(":/Resource/Image/control/CommandBarFlyout.png"));
@@ -190,7 +199,7 @@ T_Home::T_Home(QWidget* parent)
     _homeMenu->addElaIconAction(ElaIconType::ArrowRotateRight, "刷新");
     QAction* action = _homeMenu->addElaIconAction(ElaIconType::ArrowRotateLeft, "撤销");
     connect(action, &QAction::triggered, this, [=]() {
-        ElaNavigationRouter::getInstance()->navigationRouteBack();
+        ElaActionCommander::getInstance()->undoCommand("ElaWidgetToolsAction");
     });
 
     _homeMenu->addElaIconAction(ElaIconType::Copy, "复制");

@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include "Def.h"
+#include "ElaDef.h"
 class ElaCalendar;
 class ElaCalendarPicker;
 class ElaCalendarPickerContainer;
@@ -14,7 +14,7 @@ class ElaCalendarPickerPrivate : public QObject
     Q_PROPERTY_CREATE_D(int, BorderRadius)
 public:
     explicit ElaCalendarPickerPrivate(QObject* parent = nullptr);
-    ~ElaCalendarPickerPrivate();
+    ~ElaCalendarPickerPrivate() override;
     Q_SLOT void onCalendarPickerClicked();
     Q_SLOT void onCalendarSelectedDateChanged();
 

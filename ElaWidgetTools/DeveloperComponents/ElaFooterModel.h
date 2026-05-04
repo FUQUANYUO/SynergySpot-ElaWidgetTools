@@ -3,8 +3,7 @@
 
 #include <QAbstractListModel>
 
-#include "Def.h"
-#include "stdafx.h"
+#include "ElaDef.h"
 class ElaNavigationNode;
 class ElaFooterModel : public QAbstractListModel
 {
@@ -13,7 +12,7 @@ class ElaFooterModel : public QAbstractListModel
 public:
     explicit ElaFooterModel(QObject* parent = nullptr);
     ~ElaFooterModel();
-    ElaNavigationType::NodeOperateReturnType addFooterNode(QString footerTitle, QString& footerKey, bool isHasFooterPage, int keyPoints = 0, ElaIconType::IconName awesome = ElaIconType::None);
+    ElaNavigationType::NodeResult addFooterNode(QString footerTitle, QString& footerKey, bool isHasFooterPage, int keyPoints = 0, ElaIconType::IconName awesome = ElaIconType::None);
     int getFooterNodeCount() const;
     ElaNavigationNode* getNavigationNode(QString footerKey);
     void removeNavigationNode(QString footerKey);

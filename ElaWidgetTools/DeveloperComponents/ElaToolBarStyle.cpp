@@ -12,7 +12,9 @@
 ElaToolBarStyle::ElaToolBarStyle(QStyle* style)
 {
     _themeMode = eTheme->getThemeMode();
-    connect(eTheme, &ElaTheme::themeModeChanged, this, [=](ElaThemeType::ThemeMode themeMode) { _themeMode = themeMode; });
+    connect(eTheme, &ElaTheme::themeModeChanged, this, [=](ElaThemeType::ThemeMode themeMode) {
+        _themeMode = themeMode;
+    });
 }
 
 ElaToolBarStyle::~ElaToolBarStyle()
@@ -111,7 +113,7 @@ void ElaToolBarStyle::drawControl(ControlElement element, const QStyleOption* op
                 QFont iconFont = QFont("ElaAwesome");
                 iconFont.setPixelSize(18);
                 painter->setFont(iconFont);
-                painter->drawText(bopt->rect, Qt::AlignCenter, QChar((unsigned short)ElaIconType::AngleRight));
+                painter->drawText(bopt->rect, Qt::AlignCenter, QChar(ElaIconType::AngleRight));
             }
             else
             {
@@ -182,6 +184,25 @@ int ElaToolBarStyle::pixelMetric(PixelMetric metric, const QStyleOption* option,
     return QProxyStyle::pixelMetric(metric, option, widget);
 }
 
+QSize ElaToolBarStyle::sizeFromContents(ContentsType type, const QStyleOption* option, const QSize& size, const QWidget* widget) const
+{
+    if (_pToolButtonSize.isValid())
+    {
+        switch (type)
+        {
+        case QStyle::CT_ToolButton:
+        {
+            return _pToolButtonSize;
+        }
+        default:
+        {
+            break;
+        }
+        }
+    }
+    return QProxyStyle::sizeFromContents(type, option, size, widget);
+}
+
 void ElaToolBarStyle::_drawIndicator(QPainter* painter, const QStyleOptionToolButton* bopt, const QWidget* widget) const
 {
     if (bopt->features.testFlag(QStyleOptionToolButton::MenuButtonPopup))
@@ -237,6 +258,7 @@ void ElaToolBarStyle::_drawIcon(QPainter* painter, QRectF iconRect, const QStyle
                                                                              : QIcon::Off);
                 switch (bopt->toolButtonStyle)
                 {
+                case Qt::ToolButtonIconOnly:
                 case Qt::ToolButtonTextBesideIcon:
                 {
                     painter->drawPixmap(QRect(QPoint(iconRect.x(), iconRect.center().y() - iconSize.height() / 2), iconSize), iconPix);
@@ -299,7 +321,14 @@ void ElaToolBarStyle::_drawText(QPainter* painter, QRect contentRect, const QSty
 {
     if (!bopt->text.isEmpty())
     {
-        painter->setPen(ElaThemeColor(_themeMode, BasicText));
+        if (bopt->state.testFlag(QStyle::State_Enabled))
+        {
+            painter->setPen(ElaThemeColor(_themeMode, BasicText));
+        }
+        else
+        {
+            painter->setPen(ElaThemeColor(_themeMode, BasicTextDisable));
+        }
         switch (bopt->toolButtonStyle)
         {
         case Qt::ToolButtonTextOnly:

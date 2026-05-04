@@ -2,34 +2,34 @@
 
 #include <QUuid>
 
-ElaNavigationNode::ElaNavigationNode(QString nodeTitle, ElaNavigationNode* parent)
-    : QObject(parent)
+ElaNavigationNode::ElaNavigationNode(const QString& nodeTitle, ElaNavigationNode* parent)
+    : QObject(nullptr)
 {
     _pDepth = 0;
     _pKeyPoints = 0;
     _nodeKey = QUuid::createUuid().toString().remove("{").remove("}").remove("-");
-    _nodeTitle = nodeTitle;
+    _pNodeTitle = nodeTitle;
     _pIsRootNode = false;
     _pIsFooterNode = false;
     _pIsHasFooterPage = false;
     _pParentNode = parent;
     _pIsExpanderNode = false;
     _pIsVisible = false;
+    _pIsCategoryNode = false;
+    _pAwesome = ElaIconType::None;
 }
 
 ElaNavigationNode::~ElaNavigationNode()
 {
-    qDeleteAll(_pChildrenNodes);
+    for (const auto childNode: _pChildrenNodes)
+    {
+        childNode->deleteLater();
+    }
 }
 
 QString ElaNavigationNode::getNodeKey() const
 {
     return _nodeKey;
-}
-
-QString ElaNavigationNode::getNodeTitle() const
-{
-    return _nodeTitle;
 }
 
 void ElaNavigationNode::setIsExpanded(bool isExpanded)
@@ -171,4 +171,26 @@ int ElaNavigationNode::getRow() const
         return _pParentNode->getChildrenNodes().indexOf(const_cast<ElaNavigationNode*>(this));
     }
     return 0;
+}
+
+int ElaNavigationNode::getRowExceptCategoryNodes() const
+{
+    if (_pParentNode)
+    {
+        return _pParentNode->getExceptCategoryNodes().indexOf(const_cast<ElaNavigationNode*>(this));
+    }
+    return 0;
+}
+
+QList<ElaNavigationNode*> ElaNavigationNode::getExceptCategoryNodes()
+{
+    QList<ElaNavigationNode*> exceptCategoryNodeList;
+    for (auto node: _pChildrenNodes)
+    {
+        if (!node->getIsCategoryNode())
+        {
+            exceptCategoryNodeList.append(node);
+        }
+    }
+    return exceptCategoryNodeList;
 }

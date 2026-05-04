@@ -99,11 +99,15 @@ void ElaKeyBinder::mouseReleaseEvent(QMouseEvent* event)
 void ElaKeyBinder::paintEvent(QPaintEvent* event)
 {
     Q_D(ElaKeyBinder);
+    if (palette().color(QPalette::WindowText) != ElaThemeColor(d->_themeMode, BasicText))
+    {
+        d->onThemeChanged(d->_themeMode);
+    }
     QPainter painter(this);
     painter.save();
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
     painter.setPen(ElaThemeColor(d->_themeMode, BasicBorder));
-    painter.setBrush(underMouse() ? ElaThemeColor(d->_themeMode, BasicHover) : Qt::transparent);
+    painter.setBrush(underMouse() ? ElaThemeColor(d->_themeMode, BasicHover) : ElaThemeColor(d->_themeMode, BasicBase));
     QRect borderRect = rect();
     borderRect.adjust(1, 1, -1, -1);
     painter.drawRoundedRect(borderRect, d->_pBorderRadius, d->_pBorderRadius);
@@ -114,7 +118,7 @@ void ElaKeyBinder::paintEvent(QPaintEvent* event)
     painter.setPen(ElaThemeColor(d->_themeMode, BasicText));
     QRect iconRect = rect();
     iconRect.adjust(0, 0, -10, 0);
-    painter.drawText(iconRect, Qt::AlignVCenter | Qt::AlignRight, QChar((unsigned short)ElaIconType::Pencil));
+    painter.drawText(iconRect, Qt::AlignVCenter | Qt::AlignRight, QChar(ElaIconType::Pencil));
     painter.restore();
     QLabel::paintEvent(event);
 }

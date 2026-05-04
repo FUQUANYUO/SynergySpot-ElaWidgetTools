@@ -23,6 +23,8 @@ ElaToolButton::ElaToolButton(QWidget* parent)
 
 ElaToolButton::~ElaToolButton()
 {
+    Q_D(ElaToolButton);
+    delete d->_toolButtonStyle;
 }
 
 void ElaToolButton::setBorderRadius(int borderRadius)
@@ -77,8 +79,14 @@ void ElaToolButton::setMenu(ElaMenu* menu)
 
 void ElaToolButton::setElaIcon(ElaIconType::IconName icon)
 {
-    setProperty("ElaIconType", QChar((unsigned short)icon));
+    setProperty("ElaIconType", QChar(icon));
     setIcon(ElaIcon::getInstance()->getElaIcon(ElaIconType::Broom, 1));
+}
+
+void ElaToolButton::setElaIcon(ElaIconType::IconName icon, int rotate)
+{
+    setElaIcon(icon);
+    setProperty("ElaIconRotate", rotate);
 }
 
 bool ElaToolButton::eventFilter(QObject* watched, QEvent* event)

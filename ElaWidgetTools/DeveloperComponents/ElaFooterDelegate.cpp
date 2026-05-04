@@ -24,14 +24,16 @@ ElaFooterDelegate::ElaFooterDelegate(QObject* parent)
     _lastSelectMarkTopAnimation = new QPropertyAnimation(this, "lastSelectMarkTop");
     connect(_lastSelectMarkTopAnimation, &QPropertyAnimation::valueChanged, this, [=](const QVariant& value) {
         _lastSelectMarkTop = value.toReal();
-        _pElaListView->viewport()->update(); });
+        _pElaListView->viewport()->update();
+    });
     _lastSelectMarkTopAnimation->setDuration(300);
     _lastSelectMarkTopAnimation->setEasingCurve(QEasingCurve::InOutSine);
 
     _selectMarkBottomAnimation = new QPropertyAnimation(this, "selectMarkBottom");
     connect(_selectMarkBottomAnimation, &QPropertyAnimation::valueChanged, this, [=](const QVariant& value) {
         _selectMarkBottom = value.toReal();
-        _pElaListView->viewport()->update(); });
+        _pElaListView->viewport()->update();
+    });
     _selectMarkBottomAnimation->setDuration(300);
     _selectMarkBottomAnimation->setEasingCurve(QEasingCurve::InOutSine);
     connect(_lastSelectMarkTopAnimation, &QPropertyAnimation::finished, this, [=]() {
@@ -39,20 +41,23 @@ ElaFooterDelegate::ElaFooterDelegate(QObject* parent)
         _lastSelectedNode = nullptr;
         _selectMarkBottomAnimation->setStartValue(0);
         _selectMarkBottomAnimation->setEndValue(10);
-        _selectMarkBottomAnimation->start(); });
+        _selectMarkBottomAnimation->start();
+    });
 
     // Mark向下
     _lastSelectMarkBottomAnimation = new QPropertyAnimation(this, "lastSelectMarkBottom");
     connect(_lastSelectMarkBottomAnimation, &QPropertyAnimation::valueChanged, this, [=](const QVariant& value) {
         _lastSelectMarkBottom = value.toReal();
-        _pElaListView->viewport()->update(); });
+        _pElaListView->viewport()->update();
+    });
     _lastSelectMarkBottomAnimation->setDuration(300);
     _lastSelectMarkBottomAnimation->setEasingCurve(QEasingCurve::InOutSine);
 
     _selectMarkTopAnimation = new QPropertyAnimation(this, "selectMarkTop");
     connect(_selectMarkTopAnimation, &QPropertyAnimation::valueChanged, this, [=](const QVariant& value) {
         _selectMarkTop = value.toReal();
-        _pElaListView->viewport()->update(); });
+        _pElaListView->viewport()->update();
+    });
     _selectMarkTopAnimation->setDuration(300);
     _selectMarkTopAnimation->setEasingCurve(QEasingCurve::InOutSine);
     connect(_lastSelectMarkBottomAnimation, &QPropertyAnimation::finished, this, [=]() {
@@ -60,7 +65,8 @@ ElaFooterDelegate::ElaFooterDelegate(QObject* parent)
         _lastSelectedNode = nullptr;
         _selectMarkTopAnimation->setStartValue(0);
         _selectMarkTopAnimation->setEndValue(10);
-        _selectMarkTopAnimation->start(); });
+        _selectMarkTopAnimation->start();
+    });
 }
 
 ElaFooterDelegate::~ElaFooterDelegate()
@@ -101,15 +107,8 @@ void ElaFooterDelegate::navigationNodeStateChange(QVariantMap data)
 
 void ElaFooterDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-    QStyleOptionViewItem viewOption(option);
-    initStyleOption(&viewOption, index);
     ElaFooterModel* model = dynamic_cast<ElaFooterModel*>(const_cast<QAbstractItemModel*>(index.model()));
     ElaNavigationNode* node = index.data(Qt::UserRole).value<ElaNavigationNode*>();
-    if (option.state.testFlag(QStyle::State_HasFocus))
-    {
-        viewOption.state &= ~QStyle::State_HasFocus;
-    }
-    QStyledItemDelegate::paint(painter, viewOption, index);
     // 背景绘制
     QRect itemRect = option.rect;
     painter->save();
@@ -144,7 +143,7 @@ void ElaFooterDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opt
         if (index == _pPressIndex)
         {
             // 点击时颜色
-            painter->fillPath(path, ElaThemeColor(_themeMode, BasicSelectedHoverAlpha));
+            painter->fillPath(path, ElaThemeColor(_themeMode, BasicPressAlpha));
         }
         else
         {
@@ -175,12 +174,11 @@ void ElaFooterDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opt
         QFont iconFont = QFont("ElaAwesome");
         iconFont.setPixelSize(17);
         painter->setFont(iconFont);
-        painter->drawText(QRect(itemRect.x(), itemRect.y(), _iconAreaWidth, itemRect.height()), Qt::AlignCenter, QChar((unsigned short)node->getAwesome()));
+        painter->drawText(QRect(itemRect.x(), itemRect.y(), _iconAreaWidth, itemRect.height()), Qt::AlignCenter, QChar(node->getAwesome()));
         painter->restore();
     }
 
-    int keyPoints = node->getKeyPoints();
-    if (keyPoints)
+    if (int keyPoints = node->getKeyPoints())
     {
         // KeyPoints
         painter->save();
@@ -259,8 +257,5 @@ bool ElaFooterDelegate::_compareItemY(ElaNavigationNode* node1, ElaNavigationNod
     {
         return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }

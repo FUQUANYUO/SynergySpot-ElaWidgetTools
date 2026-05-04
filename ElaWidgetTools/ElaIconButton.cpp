@@ -34,8 +34,12 @@ ElaIconButton::ElaIconButton(QPixmap pix, QWidget* parent)
     d->_pIsSelected = false;
     d->_pBorderRadius = 0;
     d->_themeMode = eTheme->getThemeMode();
-    connect(this, &ElaIconButton::pIsSelectedChanged, this, [=]() { update(); });
-    connect(eTheme, &ElaTheme::themeModeChanged, this, [=](ElaThemeType::ThemeMode themeMode) { d->_themeMode = themeMode; });
+    connect(this, &ElaIconButton::pIsSelectedChanged, this, [=]() {
+        update();
+    });
+    connect(eTheme, &ElaTheme::themeModeChanged, this, [=](ElaThemeType::ThemeMode themeMode) {
+        d->_themeMode = themeMode;
+    });
 }
 
 ElaIconButton::ElaIconButton(ElaIconType::IconName awesome, QWidget* parent)
@@ -58,9 +62,13 @@ ElaIconButton::ElaIconButton(ElaIconType::IconName awesome, QWidget* parent)
     iconFont.setPixelSize(15);
     this->setFont(iconFont);
     d->_pAwesome = awesome;
-    this->setText(QChar((unsigned short)awesome));
-    connect(this, &ElaIconButton::pIsSelectedChanged, this, [=]() { update(); });
-    connect(eTheme, &ElaTheme::themeModeChanged, this, [=](ElaThemeType::ThemeMode themeMode) { d->_themeMode = themeMode; });
+    this->setText(QChar(awesome));
+    connect(this, &ElaIconButton::pIsSelectedChanged, this, [=]() {
+        update();
+    });
+    connect(eTheme, &ElaTheme::themeModeChanged, this, [=](ElaThemeType::ThemeMode themeMode) {
+        d->_themeMode = themeMode;
+    });
 }
 
 ElaIconButton::ElaIconButton(ElaIconType::IconName awesome, int pixelSize, QWidget* parent)
@@ -83,9 +91,13 @@ ElaIconButton::ElaIconButton(ElaIconType::IconName awesome, int pixelSize, QWidg
     iconFont.setPixelSize(pixelSize);
     this->setFont(iconFont);
     d->_pAwesome = awesome;
-    this->setText(QChar((unsigned short)awesome));
-    connect(this, &ElaIconButton::pIsSelectedChanged, this, [=]() { update(); });
-    connect(eTheme, &ElaTheme::themeModeChanged, this, [=](ElaThemeType::ThemeMode themeMode) { d->_themeMode = themeMode; });
+    this->setText(QChar(awesome));
+    connect(this, &ElaIconButton::pIsSelectedChanged, this, [=]() {
+        update();
+    });
+    connect(eTheme, &ElaTheme::themeModeChanged, this, [=](ElaThemeType::ThemeMode themeMode) {
+        d->_themeMode = themeMode;
+    });
 }
 
 ElaIconButton::ElaIconButton(ElaIconType::IconName awesome, int pixelSize, int fixedWidth, int fixedHeight, QWidget* parent)
@@ -108,10 +120,14 @@ ElaIconButton::ElaIconButton(ElaIconType::IconName awesome, int pixelSize, int f
     iconFont.setPixelSize(pixelSize);
     this->setFont(iconFont);
     d->_pAwesome = awesome;
-    this->setText(QChar((unsigned short)awesome));
+    this->setText(QChar(awesome));
     this->setFixedSize(fixedWidth, fixedHeight);
-    connect(this, &ElaIconButton::pIsSelectedChanged, this, [=]() { update(); });
-    connect(eTheme, &ElaTheme::themeModeChanged, this, [=](ElaThemeType::ThemeMode themeMode) { d->_themeMode = themeMode; });
+    connect(this, &ElaIconButton::pIsSelectedChanged, this, [=]() {
+        update();
+    });
+    connect(eTheme, &ElaTheme::themeModeChanged, this, [=](ElaThemeType::ThemeMode themeMode) {
+        d->_themeMode = themeMode;
+    });
 }
 
 ElaIconButton::~ElaIconButton()
@@ -122,7 +138,7 @@ void ElaIconButton::setAwesome(ElaIconType::IconName awesome)
 {
     Q_D(ElaIconButton);
     d->_pAwesome = awesome;
-    this->setText(QChar((unsigned short)awesome));
+    this->setText(QChar(awesome));
 }
 
 ElaIconType::IconName ElaIconButton::getAwesome() const
@@ -197,9 +213,9 @@ void ElaIconButton::paintEvent(QPaintEvent* event)
     painter.setPen(Qt::NoPen);
     if (d->_isAlphaAnimationFinished || d->_pIsSelected)
     {
-        painter.setBrush(d->_pIsSelected ? d->_themeMode == ElaThemeType::Light ? d->_pLightHoverColor : d->_pDarkHoverColor
-                         : isEnabled()   ? underMouse() ? d->_themeMode == ElaThemeType::Light ? d->_pLightHoverColor : d->_pDarkHoverColor : Qt::transparent
-                                         : Qt::transparent);
+        painter.setBrush(d->_pIsSelected   ? d->_themeMode == ElaThemeType::Light ? d->_pLightHoverColor : d->_pDarkHoverColor
+                             : isEnabled() ? underMouse() ? d->_themeMode == ElaThemeType::Light ? d->_pLightHoverColor : d->_pDarkHoverColor : Qt::transparent
+                                           : Qt::transparent);
     }
     else
     {
@@ -221,7 +237,7 @@ void ElaIconButton::paintEvent(QPaintEvent* event)
         painter.setPen(isEnabled() ? d->_themeMode == ElaThemeType::Light ? underMouse() ? d->_pLightHoverIconColor : d->_pLightIconColor : underMouse() ? d->_pDarkHoverIconColor
                                                                                                                                                          : d->_pDarkIconColor
                                    : ElaThemeColor(d->_themeMode, BasicTextDisable));
-        painter.drawText(rect(), Qt::AlignCenter, QChar((unsigned short)d->_pAwesome));
+        painter.drawText(rect(), Qt::AlignCenter, QChar(d->_pAwesome));
     }
     painter.restore();
 }

@@ -1,7 +1,7 @@
 #ifndef ELAWIDGETTOOLS_SRC_DEVELOPERCOMPONENTS_ELAKEYBINDERCONTAINER_H_
 #define ELAWIDGETTOOLS_SRC_DEVELOPERCOMPONENTS_ELAKEYBINDERCONTAINER_H_
 
-#include "Def.h"
+#include "ElaDef.h"
 #include <QWidget>
 class ElaKeyBinder;
 class ElaKeyBinderContainer : public QWidget
@@ -11,13 +11,13 @@ class ElaKeyBinderContainer : public QWidget
     Q_PRIVATE_CREATE(quint32, NativeVirtualBinderKey)
 public:
     explicit ElaKeyBinderContainer(QWidget* parent = nullptr);
-    ~ElaKeyBinderContainer();
+    ~ElaKeyBinderContainer() override;
     void logOrResetHistoryData(bool isLog);
     void saveBinderChanged();
 
 protected:
+    bool event(QEvent* event) override;
     virtual void mousePressEvent(QMouseEvent* event) override;
-    virtual void keyPressEvent(QKeyEvent* event) override;
     virtual void focusOutEvent(QFocusEvent* event) override;
     virtual void paintEvent(QPaintEvent* event) override;
 
@@ -28,4 +28,4 @@ private:
     ElaKeyBinder* _keyBinder{nullptr};
 };
 
-#endif//ELAWIDGETTOOLS_SRC_DEVELOPERCOMPONENTS_ELAKEYBINDERCONTAINER_H_
+#endif //ELAWIDGETTOOLS_SRC_DEVELOPERCOMPONENTS_ELAKEYBINDERCONTAINER_H_

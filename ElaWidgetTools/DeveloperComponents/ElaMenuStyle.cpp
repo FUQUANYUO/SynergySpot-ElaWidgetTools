@@ -74,7 +74,7 @@ void ElaMenuStyle::drawControl(ControlElement element, const QStyleOption* optio
             {
                 QRect menuRect = mopt->rect;
                 qreal contentPadding = menuRect.width() * 0.055;
-                qreal textLeftSpacing = menuRect.width() * 0.082;
+                qreal textLeftSpacing = 8;
                 painter->save();
                 painter->setRenderHints(QPainter::SmoothPixmapTransform | QPainter::Antialiasing | QPainter::TextAntialiasing);
                 //覆盖效果
@@ -97,7 +97,7 @@ void ElaMenuStyle::drawControl(ControlElement element, const QStyleOption* optio
                     QFont iconFont = QFont("ElaAwesome");
                     iconFont.setPixelSize(_pMenuItemHeight * 0.57);
                     painter->setFont(iconFont);
-                    painter->drawText(QRectF(menuRect.x() + contentPadding, menuRect.y(), _iconWidth, menuRect.height()), Qt::AlignCenter, mopt->checked ? QChar((unsigned short)ElaIconType::Check) : QChar((unsigned short)ElaIconType::None));
+                    painter->drawText(QRectF(menuRect.x() + contentPadding, menuRect.y(), _iconWidth, menuRect.height()), Qt::AlignCenter, mopt->checked ? QChar(ElaIconType::Check) : QChar(ElaIconType::None));
                     painter->restore();
                 }
                 else
@@ -153,7 +153,7 @@ void ElaMenuStyle::drawControl(ControlElement element, const QStyleOption* optio
                     QFont iconFont = QFont("ElaAwesome");
                     iconFont.setPixelSize(18);
                     painter->setFont(iconFont);
-                    painter->drawText(QRect(menuRect.right() - 25, menuRect.y(), 25, menuRect.height()), Qt::AlignVCenter, QChar((unsigned short)ElaIconType::AngleRight));
+                    painter->drawText(QRect(menuRect.right() - 25, menuRect.y(), 25, menuRect.height()), Qt::AlignVCenter, QChar(ElaIconType::AngleRight));
                     painter->restore();
                 }
                 painter->restore();
@@ -181,6 +181,7 @@ int ElaMenuStyle::pixelMetric(PixelMetric metric, const QStyleOption* option, co
     case QStyle::PM_SmallIconSize:
     {
         //图标宽度
+        _iconWidth = _pMenuItemHeight * 0.7;
         return _iconWidth;
     }
     case QStyle::PM_MenuPanelWidth:

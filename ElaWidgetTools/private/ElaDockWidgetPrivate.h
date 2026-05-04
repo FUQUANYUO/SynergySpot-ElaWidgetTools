@@ -3,8 +3,7 @@
 
 #include <QObject>
 
-#include "Def.h"
-#include "stdafx.h"
+#include "ElaDef.h"
 class ElaDockWidget;
 class ElaDockWidgetTitleBar;
 class ElaDockWidgetPrivate : public QObject
@@ -20,7 +19,7 @@ private:
     qint64 _currentWinID{0};
     int _margins{8};
     ElaThemeType::ThemeMode _themeMode;
-    bool _isEnableMica;
+    ElaApplicationType::WindowDisplayMode _windowDisplayMode;
     int _shadowBorderWidth{6};
     ElaDockWidgetTitleBar* _titleBar{nullptr};
 };

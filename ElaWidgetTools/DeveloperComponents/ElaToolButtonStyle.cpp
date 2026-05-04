@@ -81,6 +81,14 @@ void ElaToolButtonStyle::drawComplexControl(ComplexControl control, const QStyle
                     }
                 }
             }
+            else
+            {
+                if (!_pIsTransparent)
+                {
+                    painter->setBrush(ElaThemeColor(_themeMode, BasicDisable));
+                    painter->drawRoundedRect(toolButtonRect, _pBorderRadius, _pBorderRadius);
+                }
+            }
             // 指示器绘制
             _drawIndicator(painter, bopt, widget);
 
@@ -159,13 +167,13 @@ void ElaToolButtonStyle::_drawIndicator(QPainter* painter, const QStyleOptionToo
         QFont iconFont = QFont("ElaAwesome");
         iconFont.setPixelSize(0.75 * std::min(iconSize.width(), iconSize.height()));
         painter->setFont(iconFont);
-        int indicatorWidth = painter->fontMetrics().horizontalAdvance(QChar((unsigned short)ElaIconType::AngleDown));
+        int indicatorWidth = painter->fontMetrics().horizontalAdvance(QChar(ElaIconType::AngleDown));
         QRect expandIconRect(toolButtonRect.right() - _contentMargin - indicatorWidth, toolButtonRect.y() + 1, indicatorWidth, toolButtonRect.height());
         painter->setPen(ElaThemeColor(_themeMode, BasicText));
         painter->translate(expandIconRect.center().x(), expandIconRect.y() + (qreal)expandIconRect.height() / 2);
         painter->rotate(_pExpandIconRotate);
         painter->translate(-expandIconRect.center().x() - 1, -expandIconRect.y() - (qreal)expandIconRect.height() / 2);
-        painter->drawText(expandIconRect, Qt::AlignCenter, QChar((unsigned short)ElaIconType::AngleDown));
+        painter->drawText(expandIconRect, Qt::AlignCenter, QChar(ElaIconType::AngleDown));
         painter->restore();
     }
 }
@@ -228,12 +236,19 @@ void ElaToolButtonStyle::_drawIcon(QPainter* painter, QRectF iconRect, const QSt
                 painter->setPen(ElaThemeColor(_themeMode, BasicTextDisable));
             }
             QFont iconFont = QFont("ElaAwesome");
+            int iconRotate = widget->property("ElaIconRotate").toInt();
             switch (bopt->toolButtonStyle)
             {
             case Qt::ToolButtonIconOnly:
             {
                 iconFont.setPixelSize(0.75 * std::min(iconSize.width(), iconSize.height()));
                 painter->setFont(iconFont);
+                if (iconRotate)
+                {
+                    painter->translate(iconRect.center());
+                    painter->rotate(iconRotate);
+                    painter->translate(-iconRect.center());
+                }
                 painter->drawText(iconRect, Qt::AlignCenter, widget->property("ElaIconType").toString());
                 break;
             }
@@ -243,6 +258,12 @@ void ElaToolButtonStyle::_drawIcon(QPainter* painter, QRectF iconRect, const QSt
                 QRect adjustIconRect(iconRect.x() + _contentMargin, iconRect.y(), iconSize.width(), iconRect.height());
                 iconFont.setPixelSize(0.75 * std::min(iconSize.width(), iconSize.height()));
                 painter->setFont(iconFont);
+                if (iconRotate)
+                {
+                    painter->translate(adjustIconRect.center());
+                    painter->rotate(iconRotate);
+                    painter->translate(-adjustIconRect.center());
+                }
                 painter->drawText(adjustIconRect, Qt::AlignCenter, widget->property("ElaIconType").toString());
                 break;
             }
@@ -255,6 +276,12 @@ void ElaToolButtonStyle::_drawIcon(QPainter* painter, QRectF iconRect, const QSt
                 QRect adjustIconRect(iconRect.center().x() - iconSize.width() / 2, iconRect.y() + 0.2 * std::min(iconSize.width(), iconSize.height()), iconSize.width(), iconSize.height());
                 iconFont.setPixelSize(0.8 * std::min(iconSize.width(), iconSize.height()));
                 painter->setFont(iconFont);
+                if (iconRotate)
+                {
+                    painter->translate(adjustIconRect.center());
+                    painter->rotate(iconRotate);
+                    painter->translate(-adjustIconRect.center());
+                }
                 painter->drawText(adjustIconRect, Qt::AlignHCenter, widget->property("ElaIconType").toString());
                 break;
             }
@@ -326,7 +353,7 @@ qreal ElaToolButtonStyle::_calculateExpandIndicatorWidth(const QStyleOptionToolB
     QFont iconFont = QFont("ElaAwesome");
     iconFont.setPixelSize(0.75 * std::min(iconSize.width(), iconSize.height()));
     painter->setFont(iconFont);
-    int indicatorWidth = painter->fontMetrics().horizontalAdvance(QChar((unsigned short)ElaIconType::AngleDown));
+    int indicatorWidth = painter->fontMetrics().horizontalAdvance(QChar(ElaIconType::AngleDown));
     painter->restore();
     return indicatorWidth;
 }

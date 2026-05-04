@@ -31,6 +31,8 @@ ElaMenu::ElaMenu(const QString& title, QWidget* parent)
 
 ElaMenu::~ElaMenu()
 {
+    Q_D(ElaMenu);
+    delete d->_menuStyle;
 }
 
 void ElaMenu::setMenuItemHeight(int menuItemHeight)
@@ -69,14 +71,14 @@ ElaMenu* ElaMenu::addMenu(ElaIconType::IconName icon, const QString& title)
 {
     ElaMenu* menu = new ElaMenu(title, this);
     QMenu::addAction(menu->menuAction());
-    menu->menuAction()->setProperty("ElaIconType", QChar((unsigned short)icon));
+    menu->menuAction()->setProperty("ElaIconType", QChar(icon));
     return menu;
 }
 
 QAction* ElaMenu::addElaIconAction(ElaIconType::IconName icon, const QString& text)
 {
     QAction* action = new QAction(text, this);
-    action->setProperty("ElaIconType", QChar((unsigned short)icon));
+    action->setProperty("ElaIconType", QChar(icon));
     QMenu::addAction(action);
     return action;
 }
@@ -85,7 +87,7 @@ QAction* ElaMenu::addElaIconAction(ElaIconType::IconName icon, const QString& te
 {
     QAction* action = new QAction(text, this);
     action->setShortcut(shortcut);
-    action->setProperty("ElaIconType", QChar((unsigned short)icon));
+    action->setProperty("ElaIconType", QChar(icon));
     QMenu::addAction(action);
     return action;
 }
@@ -93,7 +95,7 @@ QAction* ElaMenu::addElaIconAction(ElaIconType::IconName icon, const QString& te
 bool ElaMenu::isHasChildMenu() const
 {
     QList<QAction*> actionList = this->actions();
-    for (auto action : actionList)
+    for (auto action: actionList)
     {
         if (action->isSeparator())
         {
@@ -110,7 +112,7 @@ bool ElaMenu::isHasChildMenu() const
 bool ElaMenu::isHasIcon() const
 {
     QList<QAction*> actionList = this->actions();
-    for (auto action : actionList)
+    for (auto action: actionList)
     {
         if (action->isSeparator())
         {
@@ -135,6 +137,7 @@ void ElaMenu::showEvent(QShowEvent* event)
     Q_D(ElaMenu);
     //消除阴影偏移
     move(this->pos().x() - 6, this->pos().y());
+    updateGeometry();
     if (!d->_animationPix.isNull())
     {
         d->_animationPix = QPixmap();
